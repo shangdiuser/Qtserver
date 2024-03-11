@@ -1,0 +1,10 @@
+//添加用户
+INSERT INTO `sm`.`employees` (`id`, `name`, `employee_id`, `department`, `join_date`) VALUES ('2', '张三', '10000', '技术部', '2024-03-11'); 
+更新用户
+UPDATE `sm`.`employees` SET `join_date` = '2024-03-11' WHERE `id` = '3'; 
+
+
+//打卡记录
+INSERT INTO `sm`.`attendance_records` (`id`, `employee_id`, `punch_in_time`, `punch_out_time`) VALUES ('2', '2', '2024-03-11 19:22:07', '2024-03-11 19:22:11'); 
+删除打卡记录
+DELETE FROM `sm`.`attendance_records` WHERE `id` = '1'; 

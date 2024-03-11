@@ -27,7 +27,7 @@ private slots:
             return;
 
         QByteArray requestData = socket->readAll();
-
+        
         // Parse request URL and parameters
         QString request = QString::fromUtf8(requestData);
         QUrl url = QUrl(request.split(' ')[1]);
@@ -49,10 +49,21 @@ private slots:
             responseData = "{\"message\": \"Hello user!\"}";
         }
         //打卡
+
         else if (path == "/Clock") {
             // Parse JSON data from request
             QJsonDocument jsonDoc = QJsonDocument::fromJson(requestData);
             QJsonObject jsonObject = jsonDoc.object();
+            qDebug() << "Received data:" << requestData;
+
+            // 输出 JSON 对象的值
+            qDebug() << "toString Value of key1:" << jsonObject["id"];
+            qDebug() << "toString Value of key2:" << jsonObject["employee_id"].toString();
+            // 输出 JSON 对象的值
+            int id = jsonObject["id"].toInt();
+
+            qDebug() << "Value of key1:" << id;
+            qDebug() << "Value of key2:" << jsonObject["employee_id"].toInt();
 
             // Insert data into database
             if (DatabaseManager::insertIntoDatabase(jsonObject)) {

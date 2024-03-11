@@ -44,11 +44,21 @@ bool DatabaseManager::insertIntoDatabase(const QJsonObject& jsonData) {
 
     // Prepare SQL query
     QSqlQuery query(db);
-    query.prepare("INSERT INTO your_table (field1, field2) VALUES (:value1, :value2)");
+    query.prepare("INSERT INTO attendance_records (id, employee_id,punch_in_time,punch_out_time,is_late,is_absent,fine_amount) VALUES (:value1, :value2, :value3, :value4, :value5, :value6, :value7)");
 
+    //INSERT INTO `sm`.`attendance_records` (`id`, `employee_id`, `punch_in_time`, `punch_out_time`) 
+    // VALUES ('2', '2', '2024-03-11 19:22:07', '2024-03-11 19:22:11'); 
+    // 
     // Bind values to placeholders
-    query.bindValue(":value1", jsonData.value("field1").toString());
-    query.bindValue(":value2", jsonData.value("field2").toInt());
+    query.bindValue(":value1", jsonData.value("id").toInt());
+    query.bindValue(":value2", jsonData.value("employee_id").toInt());
+    qDebug() << jsonData.value("id").toInt() << "8888888888";
+    qDebug() << jsonData.value("employee_id").toInt()<<"99999999999999999";
+    query.bindValue(":value3", jsonData.value("punch_in_time").toInt());
+    query.bindValue(":value4", jsonData.value("punch_out_time").toInt());
+    query.bindValue(":value5", jsonData.value("is_late").toInt());
+    query.bindValue(":value6", jsonData.value("is_absent").toInt());
+    query.bindValue(":value7", jsonData.value("fine_amount").toInt());
 
     // Execute query
     if (!query.exec()) {
