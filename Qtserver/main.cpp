@@ -42,15 +42,18 @@ void fetchDataFromDatabase() {
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    Qtserver w;
-    w.show();
-
     MyQtserver server;
     if (!server.listen(QHostAddress::Any, 8080)) {
         qDebug() << "Server could not start!";
         return -1;
     }
     qDebug() << "Server started on port 8080.";
+
+
+    Qtserver w;
+    w.show();
+
+   
    
 
     // Example usage
