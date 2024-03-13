@@ -23,9 +23,9 @@ public:
     }
 
     static  QJsonObject getJsonDataFromDatabase();
-    //²åÈë´ò¿ªÊý¾Ý
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     static  bool insertIntoDatabase(const QJsonObject& jsonData);
-    //·µ»Ø´ò¿ªµÄ¸öÈËÐÅÏ¢
+    //ï¿½ï¿½ï¿½Ø´ò¿ªµÄ¸ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     QByteArray ClockInfo(const QString& employeeId);
 
 };

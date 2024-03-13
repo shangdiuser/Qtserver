@@ -65,12 +65,12 @@ bool DatabaseManager::insertIntoDatabase(const QJsonObject& jsonData) {
     
         if (Late == true)
         {
-            isLate = 0; //Õý³£´ò¿¨
+            isLate = 0; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             qDebug() << isLate ;
         }
         else 
         {
-            isLate = 1;//³Ùµ½
+            isLate = 1;//ï¿½Ùµï¿½
             qDebug() << isLate ;
         }
 
@@ -153,10 +153,10 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
     QSqlDatabase db = QSqlDatabase::database();
     if (!db.isOpen()) {
         qDebug() << "Database is not open!";
-        return QByteArray(); // ·µ»Ø¿ÕµÄ QByteArray ±íÊ¾³ö´í
+        return QByteArray(); // ï¿½ï¿½ï¿½Ø¿Õµï¿½ QByteArray ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
     }
 
-    // Ö´ÐÐ²éÑ¯
+    // Ö´ï¿½Ð²ï¿½Ñ¯
     QSqlQuery query;
     query.prepare("SELECT attendance_records.*, employees.name, employees.department "
         "FROM attendance_records "
@@ -167,24 +167,33 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
 
     if (!query.exec()) {
         qDebug() << "Query error:" << query.lastError().text();
-        return QByteArray(); // ·µ»Ø¿ÕµÄ QByteArray ±íÊ¾³ö´í
+        return QByteArray(); // ï¿½ï¿½ï¿½Ø¿Õµï¿½ QByteArray ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½
     }
 
     QByteArray jsonData;
-    // ´¦Àí²éÑ¯½á¹û
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½
     if (query.next()) {
-        // ¹¹Ôì JSON Êý¾Ý
+        // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½
         QJsonObject jsonObject;
         jsonObject["employee_id"] = query.value("employee_id").toString();
         jsonObject["punch_in_time"] = query.value("punch_in_time").toString();
         jsonObject["punch_out_time"] = query.value("punch_out_time").toString();
-        jsonObject["is_late"] = query.value("is_late").toString();
+       // jsonObject["is_late"] = query.value("is_late").toString();
         jsonObject["is_absent"] = query.value("is_absent").toString();
         jsonObject["fine_amount"] = query.value("fine_amount").toString();
-        jsonObject["name"] = query.value("name").toString(); // Ìí¼ÓÔ±¹¤ÐÕÃû
-        jsonObject["department"] = query.value("department").toString(); // Ìí¼Ó²¿ÃÅÐÅÏ¢
+        jsonObject["name"] = query.value("name").toString(); // ï¿½ï¿½ï¿½Ô±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        jsonObject["department"] = query.value("department").toString(); // ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
 
-        // ×ª»»Îª JSON ÎÄµµ
+        if (1 == query.value("is_absent").toInt()) {
+            jsonObject["is_late"] = "è¿Ÿåˆ°";
+        }
+        else
+        {
+            jsonObject["is_late"] = "æ­£å¸¸";
+        }
+
+
+        // ×ªï¿½ï¿½Îª JSON ï¿½Äµï¿½
         QJsonDocument jsonDoc(jsonObject);
         jsonData = jsonDoc.toJson();
     }
@@ -206,7 +215,7 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
        
     }
 
-    // Ö´ÐÐ²éÑ¯
+    // Ö´ï¿½Ð²ï¿½Ñ¯
     QSqlQuery query;
     query.prepare("SELECT * FROM attendance_records WHERE employee_id = :employeeId ORDER BY id DESC LIMIT 1");
     query.bindValue(":employeeId", employeeId);
@@ -216,10 +225,10 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
        
     }
     QByteArray jsonData = nullptr;
-    // ´¦Àí²éÑ¯½á¹û
+    // ï¿½ï¿½ï¿½ï¿½ï¿½Ñ¯ï¿½ï¿½ï¿½
     if (query.next()) {
 
-        // ¹¹Ôì JSON Êý¾Ý
+        // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½
         QJsonObject jsonObject;
         jsonObject["employee_id"] = query.value("employee_id").toString();
         jsonObject["punch_in_time"] = query.value("punch_in_time").toString();
@@ -230,7 +239,7 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
 
         qDebug() << employeeId << "QJsonObject employeeId";
 
-        // ×ª»»Îª JSON ÎÄµµ
+        // ×ªï¿½ï¿½Îª JSON ï¿½Äµï¿½
         QJsonDocument jsonDoc(jsonObject);
          jsonData = jsonDoc.toJson();
 
