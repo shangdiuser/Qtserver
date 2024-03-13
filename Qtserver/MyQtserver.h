@@ -51,95 +51,42 @@ private slots:
         //打卡
 
         else if (path == "/Clock") {
-
+            qDebug() << requestData << "JrequestData";
             // 查找 JSON 数据的起始位置
-            int jsonStartIndex = requestData.indexOf("{");
-            if (jsonStartIndex == -1) {
-                qDebug() << "JSON data not found in request.";
+            int jsonDataStart = requestData.indexOf("{");
+            if (jsonDataStart != -1) {
+                QByteArray jsonData = requestData.mid(jsonDataStart);
 
-            }
+                // 解析 JSON 数据
+                QJsonParseError error;
+                QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
 
-            // 提取 JSON 数据部分
-            QByteArray jsonData = requestData.mid(jsonStartIndex);
-
-            // 解析 JSON 数据
-            QJsonParseError error;
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
-            if (error.error != QJsonParseError::NoError) {
-                qDebug() << "JSON parse error:" << error.errorString();
-
-            }
-
-            if (!jsonDoc.isObject()) {
-                qDebug() << "Received data is not a JSON object.";
-
-            }
-
-            QJsonObject jsonObject = jsonDoc.object();
-
-            // 获取 employee_id 值
-            int employeeId = jsonObject.value("employee_id").toInt();
-            qDebug() << "Employee ID:" << employeeId;
+                if (error.error == QJsonParseError::NoError && jsonDoc.isObject()) {
+                    QJsonObject jsonObj = jsonDoc.object();
+                    if (DatabaseManager::insertIntoDatabase(jsonObj)) {
+                        socket->write("HTTP/1.1 200 OK\r\n\r\n");
+                        socket->write("Data inserted into database successfully!");
+                    }
+                    else {
+                        socket->write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
+                        socket->write("Failed to insert data into database!");
+                    }
 
 
-            if (DatabaseManager::insertIntoDatabase(jsonObject)) {
-                socket->write("HTTP/1.1 200 OK\r\n\r\n");
-                socket->write("Data inserted into database successfully!");
-            }
-            else {
-                socket->write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-                socket->write("Failed to insert data into database!");
+                    
+                }
+                else {
+                    qDebug() << "JSON data not found in the request";
+                }
+
             }
         }
-        // Parse JSON data from request
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(requestData);
-        QJsonObject jsonObject = jsonDoc.object();
-        qDebug() << "Received data:" << requestData;
+        // Write HTTP response
+        socket->write("HTTP/1.1 200 OK\r\n");
+        socket->write("Content-Type: application/json\r\n");
+        socket->write("Content-Length: " + QByteArray::number(responseData.size()) + "\r\n\r\n");
+        socket->write(responseData);
 
-            /*
-            
-
-             // 从字符串创建 JSON 文档
-             QString jsonString = requestData;
-             QJsonDocument jsonDoc1 = QJsonDocument::fromJson(jsonString.toUtf8());
-             qDebug() << "jsonDoc Value of key1:" << jsonDoc1["id"].toInt();
-             qDebug() << "jsonDoc Value of key2:" << jsonDoc1["employee_id"].toInt();
-
-
-             // 输出 JSON 对象的值
-             qDebug() << "toString Value of key1:" << jsonObject["id"].toInt();
-             qDebug() << "toString Value of key2:" << jsonObject["employee_id"].toString();
-             // 输出 JSON 对象的值
-             int id = jsonObject["id"].toInt();
-
-             qDebug() << "Value of key1:" << id;
-             qDebug() << "Value of key2:" << jsonObject["employee_id"].toInt();
-
-             // Insert data into database
-             if (DatabaseManager::insertIntoDatabase(jsonObject)) {
-                 socket->write("HTTP/1.1 200 OK\r\n\r\n");
-                 socket->write("Data inserted into database successfully!");
-             }
-             else {
-                 socket->write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
-                 socket->write("Failed to insert data into database!");
-             }
-
-
-             responseData = "{\"message\": \"Hello user!\"}";
-         }else {
-             responseData = "{\"error\": \"Invalid request!\"}";
-         }
-         */
-
-
-         // Write HTTP response
-            socket->write("HTTP/1.1 200 OK\r\n");
-            socket->write("Content-Type: application/json\r\n");
-            socket->write("Content-Length: " + QByteArray::number(responseData.size()) + "\r\n\r\n");
-            socket->write(responseData);
-
-            socket->disconnectFromHost();
-        
+        socket->disconnectFromHost();
     }
 };

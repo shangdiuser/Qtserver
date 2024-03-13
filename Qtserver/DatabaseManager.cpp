@@ -49,16 +49,25 @@ bool DatabaseManager::insertIntoDatabase(const QJsonObject& jsonData) {
     //INSERT INTO `sm`.`attendance_records` (`id`, `employee_id`, `punch_in_time`, `punch_out_time`) 
     // VALUES ('2', '2', '2024-03-11 19:22:07', '2024-03-11 19:22:11'); 
     // 
-    // Bind values to placeholders
-   // query.bindValue(":value1", jsonData.value("id").toInt());
-    query.bindValue(":value2", jsonData.value("employee_id").toInt());
-    qDebug() << jsonData.value("id").toInt() << "8888888888";
-    qDebug() << jsonData.value("employee_id").toInt()<<"99999999999999999";
-    query.bindValue(":value3", jsonData.value("punch_in_time").toString());
-    query.bindValue(":value4", jsonData.value("punch_out_time").toString());
-    query.bindValue(":value5", jsonData.value("is_late").toString());
-    query.bindValue(":value6", jsonData.value("is_absent").toString());
-    query.bindValue(":value7", jsonData.value("fine_amount").toString());
+    if (jsonData.contains("employee_id") && jsonData["employee_id"].isString()) {
+        QString employeeId = jsonData["employee_id"].toString();
+        qDebug() << "Employee ID:" << employeeId;
+        // Bind values to placeholders
+  // query.bindValue(":value1", jsonData.value("id").toInt());
+        query.bindValue(":value2", jsonData["employee_id"].toString());
+      
+        qDebug() << jsonData["employee_id"].toString() << "99999999999999999";
+        query.bindValue(":value3", jsonData["punch_in_time"].toString());
+        query.bindValue(":value4", jsonData["punch_out_time"].toString());
+        query.bindValue(":value5", jsonData["is_late"].toString());
+        query.bindValue(":value6", jsonData["is_absent"].toString());
+        query.bindValue(":value7", jsonData["fine_amount"].toString());
+
+    }
+    else {
+        qDebug() << "employee_id field not found or not a string";
+    }
+   
 
     // Execute query
     if (!query.exec()) {
