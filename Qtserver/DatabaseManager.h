@@ -23,7 +23,10 @@ public:
     }
 
     static  QJsonObject getJsonDataFromDatabase();
+    //插入打开数据
     static  bool insertIntoDatabase(const QJsonObject& jsonData);
+    //返回打开的个人信息
+    QByteArray ClockInfo(const QString& employeeId);
 
 };
 #endif // DATABASEMANAGER_H

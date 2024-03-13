@@ -54,6 +54,9 @@ private slots:
             qDebug() << requestData << "JrequestData";
             // 查找 JSON 数据的起始位置
             int jsonDataStart = requestData.indexOf("{");
+
+
+
             if (jsonDataStart != -1) {
                 QByteArray jsonData = requestData.mid(jsonDataStart);
 
@@ -66,15 +69,21 @@ private slots:
                     if (DatabaseManager::insertIntoDatabase(jsonObj)) {
                         socket->write("HTTP/1.1 200 OK\r\n\r\n");
                         socket->write("Data inserted into database successfully!");
+                        DatabaseManager manager;
+                        if (jsonData.contains("employee_id") && jsonObj["employee_id"].isString()) {
+                            QString employeeId = jsonObj["employee_id"].toString();
+                            qDebug() << "Employee ID:" << employeeId;
+
+                          //  QByteArray InfoDate = manager.ClockInfo(employeeId);
+                            socket->write(manager.ClockInfo(employeeId));
+                           
+                        }
                     }
                     else {
                         socket->write("HTTP/1.1 500 Internal Server Error\r\n\r\n");
                         socket->write("Failed to insert data into database!");
                     }
-
-
-                    
-                }
+              }
                 else {
                     qDebug() << "JSON data not found in the request";
                 }
