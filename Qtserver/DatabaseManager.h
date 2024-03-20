@@ -27,6 +27,7 @@ public:
     static  bool insertIntoDatabase(const QJsonObject& jsonData);
     //���ش򿪵ĸ�����Ϣ
     QByteArray ClockInfo(const QString& employeeId);
+    QByteArray allInfo(QString id, QString name);
 
 };
 #endif // DATABASEMANAGER_H

@@ -22,6 +22,7 @@ protected:
 
 private slots:
     void readRequest() {
+        DatabaseManager manager;
         QTcpSocket* socket = qobject_cast<QTcpSocket*>(sender());
         if (!socket)
             return;
@@ -48,11 +49,11 @@ private slots:
         else if (path == "/hello" && query == "user=user") {
             responseData = "{\"message\": \"Hello user!\"}";
         }
-        //´ò¿¨
+        //ï¿½ï¿½
 
         else if (path == "/Clock") {
             qDebug() << requestData << "JrequestData";
-            // ²éÕÒ JSON Êý¾ÝµÄÆðÊ¼Î»ÖÃ
+            // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½Ê¼Î»ï¿½ï¿½
             int jsonDataStart = requestData.indexOf("{");
 
 
@@ -60,7 +61,7 @@ private slots:
             if (jsonDataStart != -1) {
                 QByteArray jsonData = requestData.mid(jsonDataStart);
 
-                // ½âÎö JSON Êý¾Ý
+                // ï¿½ï¿½ï¿½ï¿½ JSON ï¿½ï¿½ï¿½ï¿½
                 QJsonParseError error;
                 QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData, &error);
 
@@ -69,7 +70,7 @@ private slots:
                     if (DatabaseManager::insertIntoDatabase(jsonObj)) {
                         socket->write("HTTP/1.1 200 OK\r\n\r\n");
                         socket->write("Data inserted into database successfully!");
-                        DatabaseManager manager;
+                       
                         if (jsonData.contains("employee_id") && jsonObj["employee_id"].isString()) {
                             QString employeeId = jsonObj["employee_id"].toString();
                             qDebug() << "Employee ID:" << employeeId;
@@ -89,6 +90,10 @@ private slots:
                 }
 
             }
+        }
+
+        else if (path == "/allInof") {
+            manager.allInfo("1002","");
         }
         // Write HTTP response
         socket->write("HTTP/1.1 200 OK\r\n");

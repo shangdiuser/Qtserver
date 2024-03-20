@@ -95,6 +95,7 @@ bool DatabaseManager::insertIntoDatabase(const QJsonObject& jsonData) {
         qDebug() << "Required fields not found or have invalid types";
         return false;
     }
+
 }
 
 
@@ -158,12 +159,14 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
 
     // ִ�в�ѯ
     QSqlQuery query;
-    query.prepare("SELECT attendance_records.*, employees.name, employees.department "
+    query.prepare("SELECT attendance_records.*, employees.* "
         "FROM attendance_records "
-        "JOIN employees ON attendance_records.employee_id = :employeeId "
+        "JOIN employees ON attendance_records.employee_id = employees.employee_id "
         "WHERE attendance_records.employee_id = :employeeId "
         "ORDER BY attendance_records.id DESC LIMIT 1");
     query.bindValue(":employeeId", employeeId);
+
+  
 
     if (!query.exec()) {
         qDebug() << "Query error:" << query.lastError().text();
@@ -171,10 +174,11 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
     }
 
     QByteArray jsonData;
+    QJsonObject jsonObject;
     // �����ѯ���
     if (query.next()) {
         // ���� JSON ����
-        QJsonObject jsonObject;
+        
         jsonObject["employee_id"] = query.value("employee_id").toString();
         jsonObject["punch_in_time"] = query.value("punch_in_time").toString();
         jsonObject["punch_out_time"] = query.value("punch_out_time").toString();
@@ -182,6 +186,7 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
         jsonObject["is_absent"] = query.value("is_absent").toString();
         jsonObject["fine_amount"] = query.value("fine_amount").toString();
         jsonObject["name"] = query.value("name").toString(); // ���Ա������
+        jsonObject["position"] = query.value("position").toString(); //职位
         jsonObject["department"] = query.value("department").toString(); // ��Ӳ�����Ϣ
 
         if (1 == query.value("is_absent").toInt()) {
@@ -193,13 +198,97 @@ QByteArray DatabaseManager::ClockInfo(const QString& employeeId)
         }
 
 
-        // ת��Ϊ JSON �ĵ�
-        QJsonDocument jsonDoc(jsonObject);
-        jsonData = jsonDoc.toJson();
+       
     }
     else {
         qDebug() << "No records found for employee_id =" << employeeId;
+        jsonObject["is_late"] = "失败，重新录入";
     }
+    // ת��Ϊ JSON �ĵ�
+    QJsonDocument jsonDoc(jsonObject);
+    jsonData = jsonDoc.toJson();
+    return jsonData;
+}
+
+QByteArray DatabaseManager::allInfo(QString id, QString name)
+{
+    // Connect to database
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isOpen()) {
+        qDebug() << "Database is not open!";
+        return QByteArray(); // ���ؿյ� QByteArray ��ʾ����
+    }
+
+    // ִ�в�ѯ
+    QSqlQuery query;
+    query.prepare("SELECT attendance_records.*, employees.* "
+        "FROM attendance_records "
+        "JOIN employees ON attendance_records.employee_id = employees.employee_id "
+        "WHERE attendance_records.employee_id = :employeeId "
+        "ORDER BY attendance_records.id DESC LIMIT 1");
+    query.bindValue(":employeeId", employeeId);
+
+
+     id = "1001";
+     name = "张三";
+    /*SELECT e.*, ar.*
+FROM employees e
+LEFT JOIN attendance_records ar ON e.employee_id = ar.employee_id
+WHERE e.employee_id LIKE '%1002%' AND e.name LIKE '%李四%';
+*/
+    QString queryText = "SELECT employees.*, attendance_records.* FROM employees  LEFT JOIN attendance_records  ON employees.employee_id = attendance_records.employee_id";
+
+    if (!id.isEmpty() || !name.isEmpty()) {
+        // 如果有查询条件，根据工号或姓名筛选
+        queryText += " WHERE employees.employee_id LIKE '%" + id + "%' AND employees.name LIKE '%" +  + "%'";
+       
+    }
+
+    // 执行查询
+    QSqlQuery query(queryText);
+    query.bindValue(":employeeId", id);
+
+    if (!query.exec()) {
+        qDebug() << "Failed to execute query!";
+        return "查询失败";
+    }
+
+    // 创建JSON数组
+    QJsonArray jsonArray;
+    QByteArray jsonData;
+    // 将查询结果添加到JSON数组中
+    while (query.next()) {
+        QJsonObject jsonObject;
+        jsonObject["employee_id"] = query.value("employee_id").toString();
+        jsonObject["punch_in_time"] = query.value("punch_in_time").toString();
+        jsonObject["punch_out_time"] = query.value("punch_out_time").toString();
+        // jsonObject["is_late"] = query.value("is_late").toString();
+        jsonObject["is_absent"] = query.value("is_absent").toString();
+        jsonObject["fine_amount"] = query.value("fine_amount").toString();
+        jsonObject["name"] = query.value("name").toString(); // ���Ա������
+        jsonObject["position"] = query.value("position").toString(); //职位
+        jsonObject["department"] = query.value("department").toString(); // ��Ӳ�����Ϣ
+
+        if (1 == query.value("is_absent").toInt()) {
+            jsonObject["is_late"] = "迟到";
+        }
+        else
+        {
+            jsonObject["is_late"] = "正常";
+        }
+        jsonArray.append(jsonObject);
+    }
+
+    // 将JSON数组转换为JSON文档
+    QJsonDocument jsonDocument(jsonArray);
+
+    // 将JSON文档转换为字符串
+    QString jsonString = jsonDocument.toJson(QJsonDocument::Indented);
+    qDebug().noquote() << jsonString;
+
+    // ת��Ϊ JSON �ĵ�
+    QJsonDocument jsonDoc(jsonArray);
+    jsonData = jsonDoc.toJson();
 
     return jsonData;
 }
