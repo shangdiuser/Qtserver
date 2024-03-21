@@ -221,16 +221,8 @@ QByteArray DatabaseManager::allInfo(QString id, QString name)
 
     // ִ�в�ѯ
     QSqlQuery query;
-    query.prepare("SELECT attendance_records.*, employees.* "
-        "FROM attendance_records "
-        "JOIN employees ON attendance_records.employee_id = employees.employee_id "
-        "WHERE attendance_records.employee_id = :employeeId "
-        "ORDER BY attendance_records.id DESC LIMIT 1");
-    query.bindValue(":employeeId", employeeId);
-
-
-     id = "1001";
-     name = "张三";
+     //id = "1002";
+    // name = "张三";
     /*SELECT e.*, ar.*
 FROM employees e
 LEFT JOIN attendance_records ar ON e.employee_id = ar.employee_id
@@ -245,8 +237,10 @@ WHERE e.employee_id LIKE '%1002%' AND e.name LIKE '%李四%';
     }
 
     // 执行查询
-    QSqlQuery query(queryText);
-    query.bindValue(":employeeId", id);
+    //QSqlQuery query(queryText);
+    query.prepare(queryText);
+  //  query.bindValue(":employeeId", id);
+    qDebug() << "查询执行!";
 
     if (!query.exec()) {
         qDebug() << "Failed to execute query!";
@@ -268,6 +262,8 @@ WHERE e.employee_id LIKE '%1002%' AND e.name LIKE '%李四%';
         jsonObject["name"] = query.value("name").toString(); // ���Ա������
         jsonObject["position"] = query.value("position").toString(); //职位
         jsonObject["department"] = query.value("department").toString(); // ��Ӳ�����Ϣ
+
+     //   qDebug() << query.value("department").toString();
 
         if (1 == query.value("is_absent").toInt()) {
             jsonObject["is_late"] = "迟到";

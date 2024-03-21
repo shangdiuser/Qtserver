@@ -110,6 +110,10 @@ private slots:
             socket->waitForBytesWritten();
             socket->disconnectFromHost();
 
+
+            
+
+
         }
         // Write HTTP response
         socket->write("HTTP/1.1 200 OK\r\n");
