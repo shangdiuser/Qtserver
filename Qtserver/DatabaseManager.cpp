@@ -280,7 +280,7 @@ WHERE e.employee_id LIKE '%1002%' AND e.name LIKE '%李四%';
 
     // 将JSON文档转换为字符串
     QString jsonString = jsonDocument.toJson(QJsonDocument::Indented);
-    qDebug().noquote() << jsonString;
+    //qDebug().noquote() << jsonString;
 
     // ת��Ϊ JSON �ĵ�
     QJsonDocument jsonDoc(jsonArray);

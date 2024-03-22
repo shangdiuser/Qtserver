@@ -91,6 +91,7 @@ private slots:
         }
 
         else if (path == "/allInof") {
+           
             // 解析请求中的参数
             // 解析请求中的参数
             QString requestString(requestData);
@@ -103,12 +104,20 @@ private slots:
             qDebug() << "ID:" << idValue;
             qDebug() << "Name:" << nameValue;
 
-            socket->write(manager.allInfo(idValue, nameValue));
+             responseData = manager.allInfo(idValue, nameValue);
+            qDebug() << responseData << "responseData";
+           // socket->write(responseData);
+          
             // 返回响应
-            QByteArray responseData = "HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n";
+           // responseData = "{\"message\": \"Hello all!\"}";
+            socket->write("HTTP/1.1 200 OK\r\n");
+            socket->write("Content-Type: application/json\r\n");
+            socket->write("Content-Length: " + QByteArray::number(responseData.size()) + "\r\n\r\n");
             socket->write(responseData);
-            socket->waitForBytesWritten();
-            socket->disconnectFromHost();
+            qDebug() << "responseData:" << responseData;
+
+          //  socket->waitForBytesWritten();
+           // socket->disconnectFromHost();
 
         }
         // Write HTTP response
@@ -119,4 +128,6 @@ private slots:
 
         socket->disconnectFromHost();
     }
+
+
 };
