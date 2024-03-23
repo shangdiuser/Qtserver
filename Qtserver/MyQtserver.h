@@ -55,9 +55,6 @@ private slots:
             qDebug() << requestData << "JrequestData";
             // ���� JSON ���ݵ���ʼλ��
             int jsonDataStart = requestData.indexOf("{");
-
-
-
             if (jsonDataStart != -1) {
                 QByteArray jsonData = requestData.mid(jsonDataStart);
 
