@@ -232,7 +232,7 @@ WHERE e.employee_id LIKE '%1002%' AND e.name LIKE '%李四%';
 
     if (!id.isEmpty() || !name.isEmpty()) {
         // 如果有查询条件，根据工号或姓名筛选
-        queryText += " WHERE employees.employee_id LIKE '%" + id + "%' AND employees.name LIKE '%" +  + "%'";
+        queryText += " WHERE employees.employee_id LIKE '%" + id + "%' AND employees.name LIKE '%" + name + "%'";
        
     }
 
